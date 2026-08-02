@@ -1,7 +1,9 @@
 # Rolodex Contact Manager
 
 **Course:** SDC330L - Advanced Object-Oriented Programming Using Java LAB
+
 **Student:** Christopher Crayton
+
 **Project Option:** Rolodex/Contacts Application
 
 This README is a living document for the 5-week course project. It gets
