@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rolodex Contact Manager</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<!--
+=====================================================================
+Name:    Christopher Crayton
+Date:    August 11, 2026
+Purpose: View layer for the Rolodex Contact Manager web application.
+         This is a static HTML/CSS/JS front end - the "V" in the
+         project's MVC layout. It does not talk to the Java backend
+         yet; the Controller layer (a Java HttpServer-based class)
+         will be added in a later week to serve this page and expose
+         the endpoints app.js will eventually call.
+
+         Until that Controller exists, this page can be opened
+         directly in a browser (no server required) to preview the
+         planned interface. The contact stack starts empty on
+         purpose - see app.js for where real contact data will be
+         fetched from the backend once it's wired up.
+=====================================================================
+-->
+<body>
+
+<header class="app-header">
+  <span class="app-title">Rolodex Contact Manager</span>
+  <button id="quitButton" class="btn btn-quit">Quit application</button>
+</header>
+
+<main class="app-main" id="mainGrid">
+
+  <!-- ===================== SIDEBAR: Add Contact form ===================== -->
+  <section id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <span id="sidebarTitle" class="sidebar-title">Add a new contact</span>
+      <button id="collapseBtn" class="btn-icon" aria-label="Collapse sidebar">&#8249;</button>
+    </div>
+
+    <form id="addContactForm" class="sidebar-form">
+      <label class="field">
+        Contact type
+        <select id="contactType" required>
+          <option value="" disabled selected>Choose a type&hellip;</option>
+          <option value="Business">Business</option>
+          <option value="Family">Family</option>
+          <option value="Friend">Friend</option>
+          <option value="Social Media">Social media</option>
+        </select>
+      </label>
+
+      <div class="field-row">
+        <label class="field">First name<input type="text" id="firstName" placeholder="Maria" required></label>
+        <label class="field">Last name<input type="text" id="lastName" placeholder="Lopez" required></label>
+      </div>
+
+      <div class="field-row">
+        <label class="field">Phone number *<input type="text" id="phoneNumber" placeholder="757-555-0142" required></label>
+        <label class="field">Email<input type="text" id="email" placeholder="maria@example.com"></label>
+      </div>
+
+      <label class="field">Street<input type="text" id="street" placeholder="214 Maple St"></label>
+
+      <div class="field-row field-row-address">
+        <label class="field field-city">City<input type="text" id="city" placeholder="Norfolk"></label>
+        <label class="field field-state">State<input type="text" id="state" placeholder="VA"></label>
+        <label class="field field-zip">Zip<input type="text" id="zipCode" placeholder="23508"></label>
+      </div>
+
+      <div id="uniqueFieldsGroup" class="field-row hidden">
+        <label id="uniqueField1Label" class="field">Field 1<input type="text" id="uniqueField1"></label>
+        <label id="uniqueField2Label" class="field">Field 2<input type="text" id="uniqueField2"></label>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">+ Add contact</button>
+      <p id="addContactMessage" class="form-message"></p>
+    </form>
+
+    <button id="expandBtn" class="btn-icon btn-expand hidden" aria-label="Expand sidebar">+</button>
+  </section>
+
+  <!-- ===================== CONTACTS: search, filters, card stack ===================== -->
+  <section class="contacts-panel">
+    <p class="panel-title">Contacts</p>
+
+    <input type="text" id="searchBox" class="search-box" placeholder="Enter name&hellip;">
+
+    <div class="filter-row" id="filterRow">
+      <button class="filter-btn active" data-type="all">All</button>
+      <button class="filter-btn" data-type="Business">Business</button>
+      <button class="filter-btn" data-type="Family">Family</button>
+      <button class="filter-btn" data-type="Friend">Friend</button>
+      <button class="filter-btn" data-type="Social Media">Social media</button>
+      <button class="filter-btn" data-type="Personal">Personal</button>
+    </div>
+
+    <div class="stack-row">
+      <div class="stack-column">
+        <div class="stack-meta">
+          <span id="letterBadge" class="letter-badge">-</span>
+          <span id="posCounter" class="pos-counter">0 of 0</span>
+        </div>
+
+        <div id="stackViewport" class="stack-viewport">
+          <div id="stackInner" class="stack-inner"></div>
+          <p id="emptyState" class="empty-state">
+            No contacts yet.<br>Add one using the form to get started.
+          </p>
+        </div>
+
+        <p class="stack-hint">Scroll to flip through cards &mdash; wraps around at each end</p>
+      </div>
+
+      <div id="letterStrip" class="letter-strip"></div>
+    </div>
+
+    <div class="stack-base"></div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

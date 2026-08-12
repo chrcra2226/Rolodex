@@ -1,0 +1,426 @@
+/*
+=====================================================================
+Name:    Christopher Crayton
+Date:    August 11, 2026
+Purpose: Stylesheet for the Rolodex Contact Manager's View layer.
+         Colors are defined once as CSS custom properties at the top
+         so the per-contact-type color coding (used on cards once
+         real data is wired up) stays consistent and easy to adjust
+         in one place.
+=====================================================================
+*/
+
+:root {
+  /* Layout colors */
+  --header-bg: #2c3e50;
+  --panel-bg: #f7f9fc;
+  --page-bg: #eef1f5;
+  --border: #d8dee6;
+  --border-strong: #99a3b0;
+  --text-primary: #1f2733;
+  --text-secondary: #5b6472;
+  --text-muted: #8a93a1;
+
+  /* Contact-type color coding (matches the Week 1 UX design doc) */
+  --business-bg: #eaf1ff;
+  --business-text: #1c56b0;
+  --business-border: #2c80ff;
+
+  --family-bg: #eafaf1;
+  --family-text: #1e7e42;
+  --family-border: #27ae60;
+
+  --friend-bg: #fff6e6;
+  --friend-text: #a15c00;
+  --friend-border: #f39c12;
+
+  --social-bg: #f6effb;
+  --social-text: #6c2f8a;
+  --social-border: #8e44ad;
+
+  --personal-bg: #f2f3f5;
+  --personal-text: #4a5361;
+  --personal-border: #7b8492;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+}
+
+/* ===================== Header ===================== */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--header-bg);
+  color: white;
+  padding: 14px 20px;
+}
+
+.app-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* ===================== Buttons ===================== */
+
+.btn {
+  border: none;
+  border-radius: 5px;
+  padding: 9px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background-color: #2c80ff;
+  color: white;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-primary {
+  background-color: #2c80ff;
+}
+
+.btn-quit {
+  background-color: #e74c3c;
+}
+
+.btn-icon {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: inherit;
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.sidebar .btn-icon {
+  border-color: var(--border-strong);
+  color: var(--text-secondary);
+}
+
+.btn-expand {
+  width: 100%;
+  height: 34px;
+  margin-top: 4px;
+}
+
+/* ===================== Main layout ===================== */
+
+.app-main {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 16px;
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 0 16px;
+  transition: grid-template-columns 0.15s ease;
+}
+
+.app-main.collapsed {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+
+/* ===================== Sidebar / Add contact form ===================== */
+
+.sidebar {
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.sidebar-title {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.field {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  flex: 1;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.field-row {
+  display: flex;
+  gap: 8px;
+}
+
+.field-row-address .field-city { flex: 2; }
+.field-row-address .field-state,
+.field-row-address .field-zip { flex: 1; }
+
+.hidden {
+  display: none !important;
+}
+
+.form-message {
+  font-size: 0.82rem;
+  margin: 6px 0 0;
+  min-height: 1em;
+}
+
+/* ===================== Contacts panel ===================== */
+
+.contacts-panel {
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  min-width: 0;
+}
+
+.panel-title {
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin: 0 0 10px;
+}
+
+.search-box {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.filter-btn {
+  font-size: 0.75rem;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: white;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ===================== Card stack ===================== */
+
+.stack-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.stack-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.stack-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.letter-badge {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.pos-counter {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.stack-viewport {
+  position: relative;
+  height: 340px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+}
+
+.stack-inner {
+  position: absolute;
+  inset: 0;
+  perspective: 1000px;
+}
+
+/* Individual card elements are created and positioned in app.js;
+   this class supplies the shared visual styling every card shares
+   regardless of contact type. */
+.contact-card {
+  position: absolute;
+  left: 4%;
+  width: 92%;
+  min-height: 132px;
+  top: 50%;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+  border-left: 4px solid;
+}
+
+.contact-card .card-name {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.contact-card .card-type-badge {
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+.contact-card p {
+  font-size: 0.78rem;
+  margin: 4px 0 0;
+}
+
+.contact-card .card-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.contact-card .card-buttons button {
+  font-size: 0.72rem;
+  padding: 4px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}
+
+/* Back-of-card letter, positioned to whichever corner is actually
+   exposed by the card overlapping in front of it. */
+.card-back {
+  display: flex;
+  height: 100%;
+}
+
+.card-back .card-letter {
+  font-size: 26px;
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+.card-back.corner-top-left {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.card-back.corner-bottom-right {
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+/* Contact-type color variants, applied via JS by adding one of these
+   classes to a card element. */
+.type-business { background-color: var(--business-bg); border-left-color: var(--business-border); color: var(--business-text); }
+.type-family    { background-color: var(--family-bg);   border-left-color: var(--family-border);   color: var(--family-text); }
+.type-friend    { background-color: var(--friend-bg);   border-left-color: var(--friend-border);   color: var(--friend-text); }
+.type-social    { background-color: var(--social-bg);   border-left-color: var(--social-border);   color: var(--social-text); }
+.type-personal  { background-color: var(--personal-bg); border-left-color: var(--personal-border); color: var(--personal-text); }
+
+.empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0 20px;
+}
+
+.stack-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 8px 0 0;
+}
+
+.letter-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px;
+}
+
+.letter-strip button {
+  font-size: 0.65rem;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.stack-base {
+  height: 6px;
+  background-color: #2c80ff;
+  border-radius: 0 0 8px 8px;
+  margin-top: 10px;
+}
+
+/* ===================== Responsive ===================== */
+
+@media (max-width: 720px) {
+  .app-main,
+  .app-main.collapsed {
+    grid-template-columns: 1fr;
+  }
+}
