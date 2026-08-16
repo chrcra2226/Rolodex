@@ -67,14 +67,15 @@ ROLODEX/
 ├── bin/                     <- compiled .class files (regenerated on build)
 ├── lib/                     <- external jars will go here (e.g. sqlite-jdbc.jar, added in a later week)
 ├── src/
-│   ├── App.java             <- entry point: banner, welcome message, repository + polymorphism demo
+│   ├── App.java             <- entry point: banner, welcome message, repository + abstraction demo
 │   ├── repository/
 │   │   ├── ContactRepository.java         <- interface: storage contract (Week 2)
 │   │   └── InMemoryContactRepository.java <- implements ContactRepository via ArrayList (Week 2)
 │   └── model/
-│       ├── Contact.java         <- base class (inheritance parent)
+│       ├── Contact.java         <- ABSTRACT base class (inheritance parent) - Week 3
 │       ├── BusinessContact.java <- derived class (extends Contact)
 │       ├── FamilyContact.java   <- derived class (extends Contact) - Week 2
+│       ├── PersonalContact.java <- derived class (extends Contact) - Week 3
 │       └── Address.java         <- composed class (Contact has-a Address)
 └── README.md
 ```
@@ -83,8 +84,8 @@ ROLODEX/
 > package alongside `InMemoryContactRepository`, implementing the same
 > `ContactRepository` interface. `FriendContact` and `SocialMediaContact`
 > will be added to `model` following the same pattern as `BusinessContact`/
-> `FamilyContact`. See the Week 2 Software Design Document for the full
-> planned class diagram.
+> `FamilyContact`/`PersonalContact`. See the Week 2 Software Design Document
+> for the full planned class diagram.
 
 ---
 
@@ -94,7 +95,7 @@ ROLODEX/
 |---|---|---|---|
 | **Week 1** | UX design doc + inheritance/composition demo | ✅ Complete | See details below |
 | **Week 2** | Software design doc + polymorphism + interface | ✅ Complete | See details below |
-| **Week 3** | Constructors + access specifiers + abstract class | ⬜ Not started | |
+| **Week 3** | Constructors + access specifiers + abstract class | ✅ Complete | See details below |
 | **Week 4** | SQLite database implementation | ⬜ Not started | |
 | **Week 5** | Bug fixes + final delivery to full spec | ⬜ Not started | |
 
@@ -110,6 +111,15 @@ ROLODEX/
 - Added `InMemoryContactRepository`, which **implements** `ContactRepository` using an `ArrayList`. This is a placeholder for `SqliteContactRepository`, planned for Week 4 - both will implement the same interface, so `App.java` won't need to change when the swap happens.
 - `App.java` now builds a `ContactRepository`, adds all four sample contacts through it, then loops over `getAllContacts()` calling `displayInfo()` on each - this is the **polymorphism** demonstration: the same method call produces three different outputs depending on each contact's actual runtime type.
 - Deliverables submitted: `2.x Project - Software Design Document.docx` (includes a full-project class diagram covering classes planned through Week 5), updated source code, and a terminal screenshot.
+
+### Week 3 details
+- `Contact` is now **abstract**, with a new abstract method `getContactType()` - every concrete contact type is now compiler-enforced to say what kind of contact it is. `Contact`'s shared, concrete `displayInfo()` method calls this abstract method for its first line, so every subclass gets a correct "Type:" line for free.
+- Added `PersonalContact`, a new derived class, since `new Contact(...)` no longer compiles once `Contact` is abstract - this fills the "Personal" category the web view's filter buttons already expected.
+- **Access specifier fix found on review:** `Contact`'s fields were `protected`, but neither `BusinessContact` nor `FamilyContact` ever actually used that direct access - they only call inherited getters/setters or `super.displayInfo()`. Tightened to `private`, and `Contact`'s constructors are now `protected` (correct for an abstract class - only subclasses can ever call them).
+- Added a second, overloaded **constructor** to `Address`, `Contact`, `BusinessContact`, `FamilyContact`, and `PersonalContact` - each now has a full constructor plus a shorter one (no `Address` yet) that chains to the full one via `this(...)`.
+- `App.java` demonstrates the overloaded constructors directly (one `BusinessContact` is built without an address, then `setAddress()` is called afterward) and adds a dedicated loop that calls only `getContactType()`, to show the abstract method's output on its own.
+- Verified the abstraction is actually enforced: attempting `new Contact(...)` from a separate test file fails to compile with `Contact is abstract; cannot be instantiated`.
+- Deliverables submitted: updated source code and a terminal screenshot (no separate design document this week, per the Course Project Table - Week 3 only requires Demo Application Code & Screenshots).
 
 ---
 
@@ -136,6 +146,16 @@ reasoning in a later week.
   it's the piece of the app guaranteed to change (in-memory now, SQLite
   in Week 4), which makes the "why does this need to be an interface"
   justification concrete rather than arbitrary.
+- **Contact made abstract rather than left concrete.** Every real contact
+  in this app is meaningfully a specific type; a generic, category-less
+  Contact has no real-world meaning, so making it uninstantiable directly
+  turns that rule into something the compiler enforces rather than just
+  a convention. `PersonalContact` was added specifically to give the
+  "no special category" case a real, concrete class of its own.
+- **Contact's constructors are `protected`, not `public`.** Since Contact
+  is abstract, a public constructor would be misleading - nothing outside
+  a subclass can ever legally call it. `protected` says exactly what's
+  true: only `super(...)` calls from subclasses use it.
 
 ---
 
@@ -153,6 +173,13 @@ resurface:
 
 ## Changelog
 
+- **2026-08-16** - Week 3 submitted: `Contact` converted to an abstract
+  class with a new `getContactType()` abstract method, new
+  `PersonalContact` derived class, overloaded constructors added across
+  `Address`/`Contact`/`BusinessContact`/`FamilyContact`/`PersonalContact`,
+  and an access-specifier fix (`Contact`'s fields tightened from
+  protected to private after review showed no subclass needed direct
+  access).
 - **2026-08-09** - Week 2 submitted: Software Design Document (with
   full-project class diagram), `FamilyContact` (second derived class),
   `ContactRepository` interface, `InMemoryContactRepository`
