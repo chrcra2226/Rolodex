@@ -2,6 +2,7 @@ package model;
 
 /*
  * =====================================================================
+ * Part 1
  * Name:    Christopher Crayton
  * Date:    August 2, 2026
  * Purpose: Defines Contact, the BASE (parent) class for every contact
@@ -19,30 +20,61 @@ package model;
  *          below), rather than Contact extending Address. The Address is
  *          a separate, self-contained object that is simply owned by
  *          the Contact.
+ *
+ * Part 3
+ * Name:    Christopher Crayton
+ * Date:    August 16, 2026
+ * Purpose: Converted Contact into an ABSTRACT class and added an
+ *          abstract method, getContactType(). Beyond the ContactRepository
+ *          interface from Week 2, this is the other place abstraction
+ *          makes sense in this project: every contact is meaningfully
+ *          one of a specific type (Business, Family, Personal, and
+ *          eventually Friend/Social Media), and there is no real-world
+ *          meaning to a plain, generic "Contact" with no category. Making
+ *          Contact abstract makes that a compile-time rule instead of
+ *          just a convention - "new Contact(...)" will no longer compile
+ *          anywhere in the project.
+ *
+ *          Also tightened the shared fields from protected to private
+ *          (see the ACCESS SPECIFIER REVIEW note below) and added a
+ *          second, overloaded CONSTRUCTOR.
  * =====================================================================
  */
 
-public class Contact {
+public abstract class Contact { // <-- ABSTRACTION: "abstract" means this class cannot be instantiated directly
 
-    // "protected" is used here (instead of "private") specifically so
-    // that BusinessContact, which will extend this class, can refer to
-    // these fields directly if it needs to.
-    protected String firstName;
-    protected String lastName;
-    protected String phoneNumber;
-    protected String email;
+    // ACCESS SPECIFIER REVIEW (Week 3): these fields were "protected" in
+    // Weeks 1-2, on the assumption that derived classes like
+    // BusinessContact and FamilyContact would need direct access to
+    // them. Reviewing the actual subclasses shows that assumption was
+    // wrong - every subclass only ever calls the inherited public
+    // getters/setters (or super.displayInfo()), never the fields
+    // themselves. Since nothing outside this class needs direct access,
+    // "private" is the more correct, least-privilege choice, so these
+    // were tightened from protected to private this week.
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String email;
 
     // ---- COMPOSITION IN ACTION ----
     // A Contact "has-a" Address. The Address class is defined completely
     // separately (see Address.java) and is simply plugged in here as a
     // field, which is what makes this composition rather than inheritance.
-    protected Address address;
+    private Address address;
 
     /**
-     * Constructor for building a new Contact with all of its shared
-     * information at once.
+     * CONSTRUCTOR (parameterized): builds a new Contact with all of its
+     * shared information at once, including a specific Address.
+     *
+     * This constructor is declared "protected" rather than "public" -
+     * another ACCESS SPECIFIER decision worth calling out. Because
+     * Contact is abstract, "new Contact(...)" can never be written
+     * anywhere, even inside this same package, so a public constructor
+     * would be misleading. "protected" correctly communicates that only
+     * subclasses (via super(...)) are meant to call it.
      */
-    public Contact(String firstName, String lastName, String phoneNumber, String email, Address address) {
+    protected Contact(String firstName, String lastName, String phoneNumber, String email, Address address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
@@ -50,7 +82,21 @@ public class Contact {
         this.address = address; // the composed Address object is assigned here
     }
 
-    // ---- Getters and setters ----
+    /**
+     * CONSTRUCTOR (overloaded): builds a new Contact without yet
+     * knowing its Address, chaining to the constructor above via
+     * this(...) and supplying an empty Address (see Address's own
+     * no-argument constructor). This is the kind of constructor
+     * overloading the Week 3 assignment asks us to consider - not
+     * every caller will have a complete address on hand right away.
+     */
+    protected Contact(String firstName, String lastName, String phoneNumber, String email) {
+        this(firstName, lastName, phoneNumber, email, new Address());
+    }
+
+    // ---- Getters and setters (all public - this data legitimately
+    // needs to be readable/writable from outside the class, e.g. by
+    // ContactRepository implementations and the eventual web layer) ----
 
     public String getFirstName() {
         return firstName;
@@ -93,12 +139,33 @@ public class Contact {
     }
 
     /**
-     * Prints this contact's information to the console. BusinessContact
-     * will override this method to add its own extra details on top of
-     * what is printed here - that override is what will demonstrate
-     * inheritance being put to use once we reach that class.
+     * ABSTRACTION: every concrete subclass MUST provide its own
+     * implementation of this method - the compiler enforces it, so it
+     * is impossible to add a new contact type and forget to say what
+     * kind of contact it is. BusinessContact returns "Business",
+     * FamilyContact returns "Family", PersonalContact returns
+     * "Personal", and so on.
+     */
+    public abstract String getContactType();
+
+    /**
+     * Prints this contact's information to the console. This method is
+     * concrete (not abstract) because the printing logic itself is
+     * identical for every contact type - only the extra, type-specific
+     * lines differ, which is why subclasses override this method and
+     * call super.displayInfo() to reuse everything printed here.
+     *
+     * Notice the first line calls getContactType() - the ABSTRACT
+     * method above. Every subclass automatically gets a correct,
+     * consistent "Type:" line for free, without writing that line
+     * itself, simply by implementing getContactType(). That is the
+     * concrete benefit of the abstraction: shared behavior (this
+     * method) can depend on subclass-specific behavior (getContactType())
+     * without Contact needing to know which subclass it's actually
+     * running on.
      */
     public void displayInfo() {
+        System.out.println("Type:    " + getContactType()); // <-- calls the abstract method polymorphically
         System.out.println("Name:    " + firstName + " " + lastName);
         System.out.println("Phone:   " + phoneNumber);
         System.out.println("Email:   " + email);
@@ -107,3 +174,4 @@ public class Contact {
         System.out.println("Address: " + address);
     }
 }
+

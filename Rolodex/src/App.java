@@ -4,6 +4,7 @@ import model.Address;
 import model.BusinessContact;
 import model.Contact;
 import model.FamilyContact;
+import model.PersonalContact;
 import repository.ContactRepository;
 import repository.InMemoryContactRepository;
 /*
@@ -32,6 +33,17 @@ import repository.InMemoryContactRepository;
  *          call displayInfo() on objects of three different runtime
  *          types, and the correct overridden version runs automatically
  *          each time.
+ *
+ * Part 3
+ * Name:    Christopher Crayton
+ * Date:    August 16, 2026
+ * Purpose: Entry point for the Week 3 Rolodex prototype. Contact is now
+ *          ABSTRACT (see Contact.java), so the old plain "new Contact(...)"
+ *          call is replaced with the new PersonalContact class. This
+ *          week's demo also explicitly shows the abstract getContactType()
+ *          method being called polymorphically, and shows off the new
+ *          overloaded CONSTRUCTORS (with/without an Address) added to
+ *          every Contact subclass this week.
  * =====================================================================
  */
 public class App {
@@ -44,7 +56,7 @@ public class App {
         waitForUserToContinue(keyboard); // basic INPUT operation
 
         ContactRepository contactRepository = buildSampleRepository();
-        runPolymorphismDemo(contactRepository); // basic OUTPUT operations
+        runDemo(contactRepository); // basic OUTPUT operations
 
         keyboard.close();
     }
@@ -62,13 +74,13 @@ public class App {
     }
 
     /**
-     * Displays the required "this is Project Week 2" indicator, the
+     * Displays the required "this is Project Week 3" indicator, the
      * assignment title, and the student's name.
      */
     private static void displayBanner() {
         System.out.println("=====================================================");
-        System.out.println(" PROJECT WEEK 2");
-        System.out.println(" Assignment: Rolodex Contact Manager - Interface & Polymorphism Prototype");
+        System.out.println(" PROJECT WEEK 3");
+        System.out.println(" Assignment: Rolodex Contact Manager - Abstraction, Constructors & Access Specifiers");
         System.out.println(" Author:     Christopher Crayton");
         System.out.println("=====================================================");
         System.out.println();
@@ -79,12 +91,12 @@ public class App {
      * what this prototype demonstrates.
      */
     private static void displayWelcomeMessage() {
-        System.out.println("Welcome to the Week 2 prototype of the Rolodex application!");
-        System.out.println("This week builds on Week 1 by adding a second derived contact");
-        System.out.println("type (FamilyContact), a ContactRepository INTERFACE for storing");
-        System.out.println("contacts, and a demonstration of POLYMORPHISM: contacts of");
-        System.out.println("different types are displayed through a single, shared method call.");
-        System.out.println("(\"You are never too young for a rolodex!\" - Developer)");
+        System.out.println("Welcome to the Week 3 prototype of the Rolodex application!");
+        System.out.println("This week, Contact became an ABSTRACT class with a new");
+        System.out.println("abstract method, getContactType(). Every contact subclass now");
+        System.out.println("also offers multiple CONSTRUCTORS, and this week's code review");
+        System.out.println("tightened a few ACCESS SPECIFIERS that were looser than needed.");
+        System.out.println("(\"Some things are best left abstract - like this base class.\" - Developer)");
         System.out.println();
     }
 
@@ -98,29 +110,43 @@ public class App {
      * in this class only ever refers to that interface type - which is
      * what will let Week 4 swap in a SQLite-backed repository without
      * this method (or any other) needing to change.
+     *
+     * This method also demonstrates the new overloaded CONSTRUCTORS
+     * added this week: some contacts below are built with the full
+     * constructor (address known up front), and others with the
+     * shorter overload (address not yet known, added afterward via
+     * setAddress()) - both are genuinely useful depending on what
+     * information is available when a contact is first created.
      */
     private static ContactRepository buildSampleRepository() {
         ContactRepository contactRepository = new InMemoryContactRepository(); // <-- INTERFACE reference, concrete object
 
         Address homeAddress = new Address("214 Maple Street", "Norfolk", "VA", "23508");
         Address officeAddress = new Address("900 Commerce Way, Suite 300", "Virginia Beach", "VA", "23451");
-        Address secondOfficeAddress = new Address("50 Harbor Blvd", "Norfolk", "VA", "23510");
         Address familyAddress = new Address("77 Willow Court", "Chesapeake", "VA", "23320");
 
-        // A plain Contact (the BASE class).
-        Contact personalContact = new Contact(
-                "Maria", "Lopez", "757-555-0142", "maria.lopez@example.com", homeAddress);
+        // PersonalContact (NEW derived class this week) - built with the
+        // full constructor (address known up front, plus a note).
+        PersonalContact personalContact = new PersonalContact(
+                "Maria", "Lopez", "757-555-0142", "maria.lopez@example.com",
+                homeAddress, "Met at a networking event downtown.");
 
-        // A BusinessContact (DERIVED class #1, from Week 1).
+        // A BusinessContact - full constructor, address known up front.
         BusinessContact businessContact = new BusinessContact(
                 "James", "Whitfield", "757-555-0198", "j.whitfield@brightpath.com",
                 officeAddress, "BrightPath Consulting", "Senior Project Manager");
 
+        // A second BusinessContact - OVERLOADED CONSTRUCTOR: address is
+        // not yet known, so the shorter constructor is used instead, and
+        // the address is filled in afterward with setAddress() once it's
+        // available. This is exactly the situation that constructor was
+        // added for.
         BusinessContact secondBusinessContact = new BusinessContact(
                 "Priya", "Natarajan", "757-555-0177", "priya.n@coastalfinance.com",
-                secondOfficeAddress, "Coastal Finance Group", "Account Executive");
+                "Coastal Finance Group", "Account Executive");
+        secondBusinessContact.setAddress(new Address("50 Harbor Blvd", "Norfolk", "VA", "23510"));
 
-        // A FamilyContact (DERIVED class #2, new this week).
+        // A FamilyContact - full constructor, address known up front.
         FamilyContact familyContact = new FamilyContact(
                 "Devon", "Whitfield", "757-555-0111", "devon.whitfield@example.com",
                 familyAddress, "Brother", "1994-03-22");
@@ -137,17 +163,10 @@ public class App {
     }
 
     /**
-     * Retrieves every contact from the repository and displays them.
-     * This is where POLYMORPHISM is demonstrated: getAllContacts()
-     * returns a List&lt;Contact&gt;, but the objects inside it are
-     * actually a mix of Contact, BusinessContact, and FamilyContact.
-     * Every loop iteration below calls the exact same method,
-     * contact.displayInfo(), yet three different versions of that
-     * method run depending on each object's real, runtime type - Java
-     * decides which override to run automatically. No if/else chain
-     * checking each contact's type was needed to make that happen.
+     * Retrieves every contact from the repository and displays them,
+     * then separately demonstrates the abstract getContactType() method.
      */
-    private static void runPolymorphismDemo(ContactRepository contactRepository) {
+    private static void runDemo(ContactRepository contactRepository) {
         List<Contact> allContacts = contactRepository.getAllContacts();
 
         System.out.println("----- Contact Directory (via ContactRepository interface) -----");
@@ -157,11 +176,28 @@ public class App {
         // ---- POLYMORPHISM IN ACTION ----
         // "contact" below is declared as type Contact, but each object
         // it refers to on a given loop iteration might actually be a
-        // Contact, a BusinessContact, or a FamilyContact underneath.
+        // PersonalContact, a BusinessContact, or a FamilyContact
+        // underneath. displayInfo() is concrete (defined once in
+        // Contact), but its very first line calls the ABSTRACT method
+        // getContactType(), so even this shared method's output differs
+        // correctly for every contact type.
         for (Contact contact : allContacts) {
             contact.displayInfo(); // <-- the correct overridden version runs automatically
             System.out.println();
         }
+
+        // ---- ABSTRACTION, called out on its own ----
+        // This loop calls ONLY the abstract method, with nothing else,
+        // to make plain what it provides: a guaranteed, type-correct
+        // label for every contact, without a single if/else chain
+        // checking "is this a BusinessContact? a FamilyContact?"
+        // anywhere in this class.
+        System.out.println("----- Contact Types (via the abstract getContactType() method) -----");
+        for (Contact contact : allContacts) {
+            System.out.println(contact.getFirstName() + " " + contact.getLastName()
+                    + " -> " + contact.getContactType());
+        }
+        System.out.println();
 
         // A quick demonstration that the other interface methods work too.
         System.out.println("----- Contacts with a last name starting with 'W' -----");
@@ -171,6 +207,6 @@ public class App {
         }
         System.out.println();
 
-        System.out.println("End of Week 2 prototype. Thank you for reviewing!");
+        System.out.println("End of Week 3 prototype. Thank you for reviewing!");
     }
 }
