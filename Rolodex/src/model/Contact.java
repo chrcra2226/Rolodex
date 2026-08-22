@@ -38,6 +38,19 @@ package model;
  *          Also tightened the shared fields from protected to private
  *          (see the ACCESS SPECIFIER REVIEW note below) and added a
  *          second, overloaded CONSTRUCTOR.
+ *
+ * Part 4
+ * Name:    Christopher Crayton
+ * Date:    August 20, 2026
+ * Purpose: Added an "id" field, with a getter/setter and overridden
+ *          equals()/hashCode(), so contacts can be reliably identified
+ *          once they're persisted in a database (see the new
+ *          SqliteContactRepository). A ContactRepository implementation
+ *          hands back freshly-built Contact objects on every fetch, so
+ *          Java's default reference equality is no longer enough for
+ *          removeContact(contact)/updateContact(contact) to find the
+ *          right row - equals() now compares id and contact type
+ *          instead.
  * =====================================================================
  */
 
@@ -56,6 +69,11 @@ public abstract class Contact { // <-- ABSTRACTION: "abstract" means this class 
     private String lastName;
     private String phoneNumber;
     private String email;
+
+    // Added Week 4: a database-assigned identifier. 0 means "not yet
+    // saved" - a repository implementation is responsible for setting
+    // this to a real value once the contact has been persisted.
+    private int id = 0;
 
     // ---- COMPOSITION IN ACTION ----
     // A Contact "has-a" Address. The Address class is defined completely
@@ -136,6 +154,48 @@ public abstract class Contact { // <-- ABSTRACTION: "abstract" means this class 
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    /**
+     * The database-assigned id for this contact. 0 means this contact
+     * has not been saved yet.
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Sets this contact's id. This is called by a ContactRepository
+     * implementation right after a new contact is successfully saved -
+     * application code should not normally need to call this directly.
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * Two contacts are considered equal if they have the same database
+     * id AND the same contact type. The type is included because each
+     * contact type is stored in its own table with its own separate
+     * AUTOINCREMENT id sequence (see SqliteContactRepository), so a
+     * Business contact with id 3 and a Family contact with id 3 are two
+     * completely different rows, not the same contact. This override is
+     * what lets removeContact(contact)/updateContact(contact) keep
+     * working correctly even when "contact" is a freshly-fetched object
+     * from the database rather than the exact same object instance the
+     * caller created earlier.
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (!(other instanceof Contact)) return false;
+        Contact that = (Contact) other;
+        return this.id != 0 && this.id == that.id && this.getContactType().equals(that.getContactType());
+    }
+
+    @Override
+    public int hashCode() {
+        return getContactType().hashCode() * 31 + id;
     }
 
     /**

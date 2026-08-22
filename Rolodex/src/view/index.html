@@ -21,6 +21,25 @@ Purpose: View layer for the Rolodex Contact Manager web application.
          planned interface. The contact stack starts empty on
          purpose - see app.js for where real contact data will be
          fetched from the backend once it's wired up.
+
+Part 2
+Name:    Christopher Crayton
+Date:    August 20, 2026
+Purpose: Backend connected. Trimmed the contact-type dropdown and
+         filter buttons down to the three contact types that actually
+         exist (Business, Family, Personal) - Friend and Social Media
+         are still only planned, and shipping non-functional options
+         in a graded deliverable would be worse than adding them back
+         cleanly in a later week. Added the edit-contact modal markup
+         that app.js now uses for the field-by-field update flow.
+
+Part 3
+Name:    Christopher Crayton
+Date:    August 21, 2026
+Purpose: Added Friend and Social Media back into the contact-type
+         dropdown and filter buttons, now that FriendContact and
+         SocialMediaContact actually exist in the model/repository
+         layers.
 =====================================================================
 -->
 <body>
@@ -46,6 +65,7 @@ Purpose: View layer for the Rolodex Contact Manager web application.
           <option value="" disabled selected>Choose a type&hellip;</option>
           <option value="Business">Business</option>
           <option value="Family">Family</option>
+          <option value="Personal">Personal</option>
           <option value="Friend">Friend</option>
           <option value="Social Media">Social media</option>
         </select>
@@ -89,11 +109,11 @@ Purpose: View layer for the Rolodex Contact Manager web application.
 
     <div class="filter-row" id="filterRow">
       <button class="filter-btn active" data-type="all">All</button>
-      <button class="filter-btn" data-type="Business">Business</button>
-      <button class="filter-btn" data-type="Family">Family</button>
-      <button class="filter-btn" data-type="Friend">Friend</button>
-      <button class="filter-btn" data-type="Social Media">Social media</button>
-      <button class="filter-btn" data-type="Personal">Personal</button>
+      <button class="filter-btn type-business" data-type="Business">Business</button>
+      <button class="filter-btn type-family" data-type="Family">Family</button>
+      <button class="filter-btn type-personal" data-type="Personal">Personal</button>
+      <button class="filter-btn type-friend" data-type="Friend">Friend</button>
+      <button class="filter-btn type-social" data-type="Social Media">Social media</button>
     </div>
 
     <div class="stack-row">
@@ -120,6 +140,28 @@ Purpose: View layer for the Rolodex Contact Manager web application.
   </section>
 
 </main>
+
+<!-- ===================== EDIT MODAL ===================== -->
+<div id="editModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Edit contact</h2>
+    <p id="editModalContactName"></p>
+
+    <label class="field">Field to update
+      <select id="editFieldSelect"></select>
+    </label>
+
+    <label class="field">New value
+      <input type="text" id="editFieldValue">
+    </label>
+
+    <div class="modal-buttons">
+      <button id="saveEditButton" class="btn btn-primary">Save change</button>
+      <button id="cancelEditButton" class="btn btn-secondary">Cancel</button>
+    </div>
+    <p id="editMessage" class="form-message"></p>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>

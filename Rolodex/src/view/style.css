@@ -7,6 +7,22 @@ Purpose: Stylesheet for the Rolodex Contact Manager's View layer.
          so the per-contact-type color coding (used on cards once
          real data is wired up) stays consistent and easy to adjust
          in one place.
+
+Part 2
+Name:    Christopher Crayton
+Date:    August 20, 2026
+Purpose: Backend connected. Added styles for the new edit-contact
+         modal (.modal, .modal-content, .modal-buttons, .btn-secondary).
+
+Part 3
+Name:    Christopher Crayton
+Date:    August 22, 2026
+Purpose: Fixed the collapsed sidebar's "+" button appearing off-center
+         at wide viewports (the sidebar's normal padding was too large
+         for the narrow 52px collapsed column). Changed the active
+         filter-pill styling from a pale background tint to a solid,
+         darker fill of each contact type's own color with white text,
+         so the currently-selected filter is obvious at a glance.
 =====================================================================
 */
 
@@ -116,9 +132,27 @@ body {
 }
 
 .btn-expand {
-  width: 100%;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   margin-top: 4px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+/* When collapsed, the sidebar's normal 16px/18px padding leaves only
+   ~16px of content width inside the narrow 52px column (see
+   .app-main.collapsed below), which pushed the "+" button off-center.
+   This overrides the collapsed sidebar's own padding/layout so the
+   button centers correctly regardless of window width, rather than
+   only looking right by accident at narrower viewports. */
+.app-main.collapsed .sidebar {
+  padding: 16px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* ===================== Main layout ===================== */
@@ -242,9 +276,27 @@ body {
 
 .filter-btn.active {
   border-color: var(--border-strong);
-  color: var(--text-primary);
+  background: var(--border-strong);
+  color: white;
   font-weight: 500;
 }
+
+/* Color-coded filter pills, matching each contact type's card colors
+   (border/text color always visible; a solid, darker fill of that same
+   color is applied when a pill is the active filter, so the "currently
+   selected" state is obvious at a glance rather than just a subtle
+   tint). */
+.filter-btn.type-business { border-color: var(--business-border); color: var(--business-text); }
+.filter-btn.type-family    { border-color: var(--family-border);   color: var(--family-text); }
+.filter-btn.type-personal  { border-color: var(--personal-border); color: var(--personal-text); }
+.filter-btn.type-friend    { border-color: var(--friend-border);   color: var(--friend-text); }
+.filter-btn.type-social    { border-color: var(--social-border);   color: var(--social-text); }
+
+.filter-btn.type-business.active { background: var(--business-border); color: white; }
+.filter-btn.type-family.active    { background: var(--family-border);   color: white; }
+.filter-btn.type-personal.active  { background: var(--personal-border); color: white; }
+.filter-btn.type-friend.active    { background: var(--friend-border);   color: white; }
+.filter-btn.type-social.active    { background: var(--social-border);   color: white; }
 
 /* ===================== Card stack ===================== */
 
@@ -414,6 +466,47 @@ body {
   background-color: #2c80ff;
   border-radius: 0 0 8px 8px;
   margin-top: 10px;
+}
+
+/* ===================== Edit modal ===================== */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 39, 51, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 10px;
+  padding: 24px 26px;
+  width: 90%;
+  max-width: 380px;
+}
+
+.modal-content h2 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+
+#editModalContactName {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 16px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.btn-secondary {
+  background-color: #99a3b0;
 }
 
 /* ===================== Responsive ===================== */

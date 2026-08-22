@@ -6,6 +6,7 @@ import model.Contact;
 
 /*
  * =====================================================================
+ * Part 2
  * Name:    Christopher Crayton
  * Date:    August 9, 2026
  * Purpose: Defines InMemoryContactRepository, a CONCRETE class that
@@ -18,6 +19,14 @@ import model.Contact;
  *          "implements ContactRepository" below is what makes this the
  *          class that fulfills the interface's contract - every method
  *          the interface declares must have a real body here.
+ *
+ * Part 4
+ * Name:    Christopher Crayton
+ * Date:    August 20, 2026
+ * Purpose: Added id assignment to addContact() so this implementation
+ *          behaves consistently with the new SqliteContactRepository -
+ *          both now hand every contact a real, positive id, which is
+ *          what Contact's equals()/hashCode() rely on.
  * =====================================================================
  */
 public class InMemoryContactRepository implements ContactRepository { // <-- IMPLEMENTS the interface
@@ -26,6 +35,10 @@ public class InMemoryContactRepository implements ContactRepository { // <-- IMP
     // through the interface methods below (encapsulation).
     private List<Contact> contacts;
 
+    // Simple counter used to hand out ids, one contact type at a time -
+    // mirrors how SQLite's AUTOINCREMENT assigns ids per table.
+    private int nextId = 1;
+
     /** Constructor - starts with an empty contact list. */
     public InMemoryContactRepository() {
         this.contacts = new ArrayList<>();
@@ -33,6 +46,8 @@ public class InMemoryContactRepository implements ContactRepository { // <-- IMP
 
     @Override
     public void addContact(Contact contact) {
+        contact.setId(nextId);
+        nextId++;
         contacts.add(contact);
     }
 
@@ -70,3 +85,4 @@ public class InMemoryContactRepository implements ContactRepository { // <-- IMP
         return matches;
     }
 }
+
